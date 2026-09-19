@@ -1,0 +1,41 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turf-tracking-system",
+  // Cloudflare account for Workers deployment (not a secret).
+  // This root file is authoritative: `dist/server/wrangler.json` is
+  // regenerated from it on every `build:vinext`, so account/Worker
+  // settings live here exactly once.
+  "account_id": "efd3ab870eaef888d1fadede95d50739",
+  "compatibility_date": "2026-09-19",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "main": "vinext/server/fetch-handler",
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  },
+  // Workers-native abuse protection for sensitive routes only.
+  // Public availability reads (/, slots, /privacy, /terms, robots, sitemap)
+  // are intentionally NOT limited here. Each binding has a unique
+  // namespace_id so counters are never shared between routes.
+  // Secret keys are NEVER vars — SUPABASE_SERVICE_ROLE_KEY is a Worker secret.
+  "ratelimits": [
+    {
+      // Staff sign-in form loads: staff is a handful of people; 10/min/IP
+      // stops form probing while never touching legitimate use.
+      "name": "LOGIN_RATE_LIMIT",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    },
+    {
+      // Slot-generation API: the dashboard fires ~1 call per turf/date
+      // change (worst case ~14 rapid calls browsing 7 dates x 2 turfs),
+      // so 60/min/IP allows real browsing while stopping floods.
+      "name": "ENSURE_SLOTS_RATE_LIMIT",
+      "namespace_id": "1002",
+      "simple": { "limit": 60, "period": 60 }
+    }
+  ]
+}
