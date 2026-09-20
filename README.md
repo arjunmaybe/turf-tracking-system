@@ -223,8 +223,8 @@ Notes:
   `.env` file is needed, and none should be created.
 - `wrangler.jsonc` (root) is authoritative: `dist/server/wrangler.json` is
   regenerated from it on every `build:vinext`. It already carries the
-  Cloudflare account ID; `NEXT_PUBLIC_SITE_URL` stays unset until the real
-  production domain exists.
+  Cloudflare account ID; `NEXT_PUBLIC_SITE_URL` is set in `wrangler.jsonc`
+  `vars` to the deployed workers.dev hostname (no custom domain).
 
 ## Cloudflare edge checklist (dashboard, after domain is configured)
 

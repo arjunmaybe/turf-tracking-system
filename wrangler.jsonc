@@ -16,6 +16,12 @@
     "not_found_handling": "none",
     "binding": "ASSETS"
   },
+  // Public, non-secret canonical hostname for the deployed Worker.
+  // Served to server runtime via process.env (nodejs_compat); read by
+  // lib/site.ts for canonical/OG/sitemap. Secrets are NEVER vars.
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://turf-tracking-system.cityarena.workers.dev"
+  },
   // Workers-native abuse protection for sensitive routes only.
   // Public availability reads (/, slots, /privacy, /terms, robots, sitemap)
   // are intentionally NOT limited here. Each binding has a unique
