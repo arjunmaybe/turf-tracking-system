@@ -17,10 +17,13 @@
     "binding": "ASSETS"
   },
   // Public, non-secret canonical hostname for the deployed Worker.
-  // Served to server runtime via process.env (nodejs_compat); read by
-  // lib/site.ts for canonical/OG/sitemap. Secrets are NEVER vars.
+  // Served to the server runtime via process.env (nodejs_compat); read by
+  // lib/site.ts for canonical/OG/sitemap. This MUST be SITE_URL (never
+  // NEXT_PUBLIC_*): NEXT_PUBLIC_* values are inlined at build time, so a
+  // runtime Worker var under that prefix can never override the baked
+  // value. Secrets are NEVER vars.
   "vars": {
-    "NEXT_PUBLIC_SITE_URL": "https://turf-tracking-system.cityarena.workers.dev"
+    "SITE_URL": "https://turf-tracking-system.cityarena.workers.dev"
   },
   // Workers-native abuse protection for sensitive routes only.
   // Public availability reads (/, slots, /privacy, /terms, robots, sitemap)
