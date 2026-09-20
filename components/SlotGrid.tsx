@@ -13,7 +13,7 @@ export function SlotGrid({
 }: Props) {
   if (slots.length === 0) {
     return (
-      <p role="status" className="rounded-2xl bg-zinc-900 p-4 text-sm text-zinc-400 ring-1 ring-zinc-800">
+      <p role="status" className="tt-glass rounded-3xl p-4 text-sm text-white/60">
         {emptyMessage}
       </p>
     );

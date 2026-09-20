@@ -23,6 +23,10 @@ import { StatusBanner } from "@/components/StatusBanner";
 import { DateSelector } from "@/components/DateSelector";
 import { SlotCard } from "@/components/SlotCard";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { HeroCard } from "@/components/HeroCard";
+import { InquirySheet } from "@/components/InquirySheet";
+import { ContactBar } from "@/components/ContactBar";
+import { Toasts, type ToastItem } from "@/components/Toasts";
 
 const DATE_COUNT = 7;
 
@@ -56,6 +60,8 @@ export function PublicDashboard({
   const [contactSlotId, setContactSlotId] = useState<string | null>(
     initialSlots.find((s) => s.status === "free")?.id ?? null,
   );
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [loadingTurfs, setLoadingTurfs] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +70,24 @@ export function PublicDashboard({
   const configured = serverConfigured && isSupabaseConfigured();
   const reloadToken = useRef(0);
   const hadServerData = useRef(initialTurfs.length > 0);
+  const toastId = useRef(0);
+  const toastTimers = useRef<number[]>([]);
+
+  const pushToast = useCallback((message: string) => {
+    const id = ++toastId.current;
+    setToasts((prev) => [...prev.slice(-2), { id, message }]);
+    const timer = window.setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 2600);
+    toastTimers.current.push(timer);
+  }, []);
+
+  useEffect(() => {
+    const timers = toastTimers.current;
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+  }, []);
 
   const dates = useMemo(
     () => Array.from({ length: DATE_COUNT }, (_, i) => {
@@ -78,6 +102,25 @@ export function PublicDashboard({
   void getBusinessDatePlus;
 
   const selectedTurf = turfs.find((t) => t.id === selectedTurfId) ?? null;
+
+  const handleTurfSelect = useCallback((id: string) => {
+    setSelectedTurfId(id);
+    const name = turfs.find((t) => t.id === id)?.name;
+    if (name) pushToast(`${name} selected`);
+  }, [turfs, pushToast]);
+
+  const handleDateSelect = useCallback((date: string) => {
+    setSelectedDate(date);
+    pushToast(`Showing ${formatDateLabel(date)}`);
+  }, [pushToast]);
+
+  const handleSlotTap = useCallback((slot: Slot) => {
+    setContactSlotId(slot.id);
+    if (slot.status === "free") {
+      pushToast(`${formatSlotRange(slot.start_time, slot.end_time)} selected for inquiry`);
+      setSheetOpen(true);
+    }
+  }, [pushToast]);
 
   const loadTurfs = useCallback(async () => {
     if (!configured) {
@@ -248,8 +291,8 @@ export function PublicDashboard({
   if (!configured) {
     return (
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-4">
-        <TurfHeader turf={null} />
-        <div role="alert" className="rounded-2xl bg-amber-500/15 p-4 text-sm text-amber-200 ring-1 ring-amber-500/40">
+        <TurfHeader turf={null} live={false} />
+        <div role="alert" className="tt-glass rounded-3xl p-4 text-sm text-amber-200 ring-1 ring-amber-300/30">
           Supabase is not configured. Copy <code>.env.example</code> to{" "}
           <code>.env.local</code> and set{" "}
           <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
@@ -261,99 +304,125 @@ export function PublicDashboard({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-4 pb-10">
-      <TurfHeader turf={selectedTurf} />
+    <main className="tt-ambient mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-4 pb-10">
+      <TurfHeader turf={selectedTurf} live={realtimeState === "live"} />
 
-      {error && (
-        <div role="alert" className="rounded-2xl bg-red-500/15 p-4 text-sm text-red-200 ring-1 ring-red-500/40">
-          {error}{" "}
-          <button onClick={() => selectedTurfId && void loadSlots(selectedTurfId, selectedDate)} className="underline">
-            Retry
-          </button>
-        </div>
-      )}
-      {realtimeState !== "live" && (
-        <div role="status" className="rounded-2xl bg-amber-500/15 p-3 text-xs text-amber-200 ring-1 ring-amber-500/40">
-          {realtimeState === "reconnecting"
-            ? "Reconnecting live updates…"
-            : (realtimeError ?? "Live updates disconnected. Changes may require refresh.")}
-        </div>
-      )}
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4">
+        {error && (
+          <div role="alert" className="tt-glass rounded-3xl p-4 text-sm text-rose-200 ring-1 ring-rose-400/30">
+            {error}{" "}
+            <button onClick={() => selectedTurfId && void loadSlots(selectedTurfId, selectedDate)} className="font-bold underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300">
+              Retry
+            </button>
+          </div>
+        )}
+        {realtimeState !== "live" && (
+          <div role="status" className="tt-glass rounded-3xl p-3 text-xs text-amber-200 ring-1 ring-amber-300/30">
+            {realtimeState === "reconnecting"
+              ? "Reconnecting live updates…"
+              : (realtimeError ?? "Live updates disconnected. Changes may require refresh.")}
+          </div>
+        )}
 
-      {loadingTurfs ? (
-        <p role="status" className="text-sm text-zinc-400">Loading turfs…</p>
-      ) : turfs.length === 0 ? (
-        <p role="status" className="rounded-2xl bg-zinc-900 p-4 text-sm text-zinc-400 ring-1 ring-zinc-800">
-          No turfs configured yet. Ask staff to run <code>supabase/seed.sql</code>.
-        </p>
-      ) : (
-        <>
-          <TurfSelector turfs={turfs} selectedId={selectedTurfId} onSelect={(id) => setSelectedTurfId(id)} />
-          <StatusBanner status={selectedDate === todayStr ? liveStatus : null} loading={loadingSlots} />
-          {selectedDate !== todayStr && !loadingSlots && (
-            <p role="status" className="rounded-2xl bg-zinc-900 p-3 text-xs text-zinc-400 ring-1 ring-zinc-800">
-              {formatDateLabel(selectedDate)}: {counts.free} free · {counts.booked} booked · {counts.maintenance} maintenance
-            </p>
-          )}
-
-          <section aria-label="Schedule">
-            <h2 className="mb-2 text-sm font-bold uppercase tracking-wider text-zinc-400">
-              {selectedDate === todayStr ? "Today's schedule" : `Schedule — ${formatDateLabel(selectedDate)}`}
-            </h2>
-            <DateSelector dates={dates} selected={selectedDate} todayStr={todayStr} onSelect={setSelectedDate} />
-            <div className="mt-3">
-              {loadingSlots ? (
-                <p role="status" className="text-sm text-zinc-400">Loading slots…</p>
-              ) : slots.length === 0 ? (
-                <p role="status" className="rounded-2xl bg-zinc-900 p-4 text-sm text-zinc-400 ring-1 ring-zinc-800">
-                  No slots for this date yet.
-                </p>
-              ) : (
-                <ul aria-label="Daily slots" className="flex flex-col gap-2">
-                  {slots.map((s) => {
-                    const active = s.id === contactSlot?.id;
-                    return (
-                      <li key={s.id}>
-                        <button
-                          onClick={() => setContactSlotId(s.id)}
-                          aria-pressed={active}
-                          title={active ? "Selected for WhatsApp message" : `Use ${formatSlotRange(s.start_time, s.end_time)} for WhatsApp message`}
-                          className={`w-full rounded-2xl ring-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 ${active ? "ring-emerald-400" : "ring-transparent hover:ring-zinc-700"}`}
-                        >
-                          <SlotCard slot={s} />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </section>
-
-          <section aria-label="Contact" className="flex flex-col gap-2">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
-              Contact manager
-            </h2>
-            {contactSlot ? (
-              <p className="text-xs text-zinc-400">
-                Message will ask about{" "}
-                <strong className="text-zinc-200">
-                  {formatSlotRange(contactSlot.start_time, contactSlot.end_time)}
-                </strong>
-                . Tap any slot above to change it. The manager confirms the actual booking.
-              </p>
-            ) : (
-              <p className="text-xs text-zinc-400">
-                No free slot selected — the manager confirms availability on WhatsApp.
+        {loadingTurfs ? (
+          <p role="status" className="text-sm text-white/50">Loading turfs…</p>
+        ) : turfs.length === 0 ? (
+          <p role="status" className="tt-glass rounded-3xl p-4 text-sm text-white/60">
+            No turfs configured yet. Ask staff to run <code>supabase/seed.sql</code>.
+          </p>
+        ) : (
+          <>
+            <HeroCard
+              turfName={selectedTurf?.name ?? null}
+              status={selectedDate === todayStr ? liveStatus : null}
+              loading={loadingSlots}
+              live={realtimeState === "live"}
+            />
+            <TurfSelector turfs={turfs} selectedId={selectedTurfId} onSelect={handleTurfSelect} />
+            <StatusBanner status={selectedDate === todayStr ? liveStatus : null} loading={loadingSlots} />
+            {selectedDate !== todayStr && !loadingSlots && (
+              <p role="status" className="tt-glass rounded-3xl p-3 font-mono text-[11px] tracking-wider text-white/60">
+                {formatDateLabel(selectedDate).toUpperCase()}: {counts.free} FREE · {counts.booked} BOOKED · {counts.maintenance} MAINTENANCE
               </p>
             )}
-            <WhatsAppButton whatsappUrl={whatsappUrl} callUrl={callUrl} />
-            <p className="text-[11px] leading-relaxed text-zinc-500">
-              Availability tracker only — no online booking or payment. The manager confirms every reservation externally.
-            </p>
-          </section>
-        </>
-      )}
+
+            <section aria-label="Schedule">
+              <div className="mb-2 flex items-baseline justify-between gap-2">
+                <h2 className="tt-eyebrow text-white/50">
+                  {selectedDate === todayStr ? "Today's schedule" : `Schedule — ${formatDateLabel(selectedDate)}`}
+                </h2>
+                <p className="font-mono text-[10px] tracking-widest text-lime-200/70">
+                  {counts.free} FREE
+                </p>
+              </div>
+              <DateSelector dates={dates} selected={selectedDate} todayStr={todayStr} onSelect={handleDateSelect} />
+              <div className="mt-3">
+                {loadingSlots ? (
+                  <p role="status" className="text-sm text-white/50">Loading slots…</p>
+                ) : slots.length === 0 ? (
+                  <p role="status" className="tt-glass rounded-3xl p-4 text-sm text-white/60">
+                    No slots for this date yet.
+                  </p>
+                ) : (
+                  <ul aria-label="Daily slots" className="flex flex-col gap-2">
+                    {slots.map((s) => {
+                      const active = s.id === contactSlot?.id;
+                      return (
+                        <li key={s.id}>
+                          <button
+                            onClick={() => handleSlotTap(s)}
+                            aria-pressed={active}
+                            title={active ? "Selected for WhatsApp message" : `Use ${formatSlotRange(s.start_time, s.end_time)} for WhatsApp message`}
+                            className={`w-full rounded-3xl ring-2 transition active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300 ${active ? "ring-lime-300" : "ring-transparent hover:ring-white/20"}`}
+                          >
+                            <SlotCard slot={s} />
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </section>
+
+            <section aria-label="Contact" className="tt-glass flex flex-col gap-2 rounded-3xl p-4">
+              <h2 className="tt-eyebrow text-white/50">
+                Contact manager
+              </h2>
+              {contactSlot ? (
+                <p className="text-xs leading-relaxed text-white/60">
+                  Message will ask about{" "}
+                  <strong className="text-[#f4efe3]">
+                    {formatSlotRange(contactSlot.start_time, contactSlot.end_time)}
+                  </strong>
+                  . Tap a free slot above to open an inquiry. The manager confirms the actual booking.
+                </p>
+              ) : (
+                <p className="text-xs text-white/60">
+                  No free slot selected — the manager confirms availability on WhatsApp.
+                </p>
+              )}
+              <WhatsAppButton whatsappUrl={whatsappUrl} callUrl={callUrl} />
+              <p className="text-[11px] leading-relaxed text-white/40">
+                Availability tracker only — no online booking or payment. The manager confirms every reservation externally.
+              </p>
+            </section>
+          </>
+        )}
+
+        <ContactBar whatsappUrl={whatsappUrl} onWhatsApp={() => pushToast("Opening WhatsApp…")} />
+      </div>
+
+      <InquirySheet
+        open={sheetOpen && contactSlot !== null}
+        turfName={selectedTurf?.name ?? ""}
+        slot={contactSlot}
+        whatsappUrl={whatsappUrl}
+        callUrl={callUrl}
+        onClose={() => setSheetOpen(false)}
+        onContactAction={() => pushToast("Contacting manager…")}
+      />
+      <Toasts toasts={toasts} />
     </main>
   );
 }

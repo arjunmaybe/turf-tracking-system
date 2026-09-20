@@ -46,18 +46,18 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+      <body className="tt-ambient min-h-full flex flex-col text-[#f4efe3]">
         {children}
-        <footer className="mx-auto w-full max-w-xl px-4 pb-6 pt-2">
+        <footer className="mx-auto w-full max-w-xl px-4 pb-24 pt-2">
           <nav
             aria-label="Footer"
-            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500"
+            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-mono text-[10px] tracking-[0.18em] text-white/40"
           >
-            <span>Availability tracker — manager confirms every booking.</span>
-            <a href="/privacy" className="underline hover:text-zinc-300 focus-visible:outline-2 focus-visible:outline-emerald-400">
+            <span>AVAILABILITY TRACKER — MANAGER CONFIRMS EVERY BOOKING</span>
+            <a href="/privacy" className="underline hover:text-white/70 focus-visible:outline-2 focus-visible:outline-lime-300">
               Privacy
             </a>
-            <a href="/terms" className="underline hover:text-zinc-300 focus-visible:outline-2 focus-visible:outline-emerald-400">
+            <a href="/terms" className="underline hover:text-white/70 focus-visible:outline-2 focus-visible:outline-lime-300">
               Terms
             </a>
           </nav>

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
+  --background: #060b16;
+  --foreground: #f4efe3;
   color-scheme: dark;
 }
 
@@ -13,8 +13,150 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---------- TurfTrack design system ---------- */
+
+.tt-ambient {
+  background:
+    radial-gradient(42rem 22rem at 85% -4rem, rgba(163, 230, 53, 0.09), transparent 60%),
+    radial-gradient(36rem 24rem at -10% 12%, rgba(56, 130, 246, 0.12), transparent 60%),
+    radial-gradient(30rem 30rem at 50% 110%, rgba(163, 230, 53, 0.05), transparent 60%),
+    #060b16;
+}
+
+.tt-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.tt-glass-deep {
+  background: linear-gradient(165deg, rgba(13, 22, 43, 0.92), rgba(8, 13, 26, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.tt-eyebrow {
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.tt-display {
+  font-family: var(--font-display);
+}
+
+.tt-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tt-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes tt-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes tt-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(163, 230, 53, 0.55);
+  }
+  50% {
+    opacity: 0.75;
+    box-shadow: 0 0 0 6px rgba(163, 230, 53, 0);
+  }
+}
+
+@keyframes tt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tt-sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tt-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tt-anim-float {
+  animation: tt-float 7s ease-in-out infinite;
+}
+.tt-anim-pulse-dot {
+  animation: tt-pulse-dot 2.2s ease-in-out infinite;
+}
+.tt-anim-rise {
+  animation: tt-rise 0.5s ease both;
+}
+.tt-anim-sheet {
+  animation: tt-sheet-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.tt-anim-fade {
+  animation: tt-fade-in 0.25s ease both;
+}
+.tt-anim-toast {
+  animation: tt-toast-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-anim-float,
+  .tt-anim-pulse-dot,
+  .tt-anim-rise,
+  .tt-anim-sheet,
+  .tt-anim-fade,
+  .tt-anim-toast {
+    animation: none;
+  }
 }

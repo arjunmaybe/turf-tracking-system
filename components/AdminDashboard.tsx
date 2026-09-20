@@ -323,8 +323,8 @@ export function AdminDashboard({
 
   if (!configured) {
     return (
-      <main className="mx-auto w-full max-w-xl flex-1 p-4">
-        <div role="alert" className="rounded-2xl bg-amber-500/15 p-4 text-sm text-amber-200 ring-1 ring-amber-500/40">
+      <main className="tt-ambient mx-auto w-full max-w-xl flex-1 p-4">
+        <div role="alert" className="tt-glass rounded-3xl p-4 text-sm text-amber-200 ring-1 ring-amber-300/30">
           Supabase is not configured. See <code>.env.example</code> and README.
         </div>
       </main>
@@ -333,20 +333,20 @@ export function AdminDashboard({
 
   if (!authChecked || (loading && turfs.length === 0)) {
     return (
-      <main className="mx-auto w-full max-w-xl flex-1 p-4">
-        <p role="status" className="text-sm text-zinc-400">Loading admin…</p>
+      <main className="tt-ambient mx-auto w-full max-w-xl flex-1 p-4">
+        <p role="status" className="text-sm text-white/50">Loading admin…</p>
       </main>
     );
   }
 
   if (authChecked && !isStaff) {
     return (
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-3 p-4">
-        <h1 className="text-xl font-bold text-white">Not authorized</h1>
-        <p role="alert" className="rounded-2xl bg-red-500/15 p-4 text-sm text-red-200 ring-1 ring-red-500/40">
+      <main className="tt-ambient mx-auto flex w-full max-w-md flex-1 flex-col gap-3 p-4">
+        <h1 className="tt-display text-2xl font-bold text-[#f4efe3]">Not authorized</h1>
+        <p role="alert" className="tt-glass rounded-3xl p-4 text-sm text-rose-200 ring-1 ring-rose-400/30">
           {error ?? "This account is not authorized for staff access."} Sign in with a staff account{email ? ` (currently ${email})` : ""}.
         </p>
-        <button onClick={signOut} className="min-h-12 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+        <button onClick={signOut} className="min-h-12 rounded-2xl bg-[#f4efe3] px-4 py-3 text-sm font-black text-lime-950 transition active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
           Sign out
         </button>
       </main>
@@ -354,32 +354,34 @@ export function AdminDashboard({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-4 pb-10">
-      <header className="flex items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg font-bold text-white">Staff Admin</h1>
-          <p className="text-xs text-zinc-400">{email} · tap a slot to update (1–2 taps)</p>
+    <main className="tt-ambient mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 p-4 pb-10">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4">
+      <header className="tt-glass flex items-center justify-between gap-2 rounded-3xl p-4">
+        <div className="min-w-0">
+          <p className="tt-eyebrow text-lime-200/80">City Arena · Staff</p>
+          <h1 className="tt-display truncate text-2xl font-bold text-[#f4efe3]">Staff Admin</h1>
+          <p className="truncate font-mono text-[10px] tracking-wider text-white/50">{email} · tap a slot to update</p>
         </div>
         <button
           onClick={signOut}
-          className="min-h-11 shrink-0 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-bold text-zinc-200 ring-1 ring-zinc-700 hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
+          className="min-h-11 shrink-0 rounded-xl bg-white/5 px-4 py-2 text-sm font-bold text-white/80 ring-1 ring-white/15 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300"
         >
           Sign out
         </button>
       </header>
 
       {error && (
-        <div role="alert" className="rounded-2xl bg-red-500/15 p-3 text-sm text-red-200 ring-1 ring-red-500/40">
+        <div role="alert" className="tt-glass rounded-3xl p-3 text-sm text-rose-200 ring-1 ring-rose-400/30">
           {error}
         </div>
       )}
       {notice && (
-        <div role="status" className="rounded-2xl bg-emerald-500/15 p-3 text-sm text-emerald-200 ring-1 ring-emerald-500/40">
+        <div role="status" className="tt-glass rounded-3xl p-3 text-sm text-lime-200 ring-1 ring-lime-300/30">
           {notice}
         </div>
       )}
       {realtimeState !== "live" && (
-        <div role="status" className="rounded-2xl bg-amber-500/15 p-3 text-xs text-amber-200 ring-1 ring-amber-500/40">
+        <div role="status" className="tt-glass rounded-3xl p-3 text-xs text-amber-200 ring-1 ring-amber-300/30">
           {realtimeState === "reconnecting" ? "Reconnecting live updates…" : "Live updates disconnected. Changes may require refresh."}
         </div>
       )}
@@ -396,27 +398,27 @@ export function AdminDashboard({
       <StatusBanner status={liveStatus} loading={loading} />
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Quick actions">
-        <button disabled={quickBusy} onClick={() => void bookNextHours(1)} className="min-h-11 flex-1 rounded-xl bg-red-500/20 px-3 py-2 text-xs font-black text-red-100 ring-1 ring-red-500/40 hover:bg-red-500/30 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
+        <button disabled={quickBusy} onClick={() => void bookNextHours(1)} className="min-h-11 flex-1 rounded-xl bg-rose-400/15 px-3 py-2 text-xs font-black text-rose-100 ring-1 ring-rose-400/30 transition hover:bg-rose-400/25 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300">
           Book next 1h
         </button>
-        <button disabled={quickBusy} onClick={() => void bookNextHours(2)} className="min-h-11 flex-1 rounded-xl bg-red-500/20 px-3 py-2 text-xs font-black text-red-100 ring-1 ring-red-500/40 hover:bg-red-500/30 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400">
+        <button disabled={quickBusy} onClick={() => void bookNextHours(2)} className="min-h-11 flex-1 rounded-xl bg-rose-400/15 px-3 py-2 text-xs font-black text-rose-100 ring-1 ring-rose-400/30 transition hover:bg-rose-400/25 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300">
           Book next 2h
         </button>
-        <button disabled={quickBusy} onClick={() => void freeRemaining()} className="min-h-11 flex-1 rounded-xl bg-emerald-500/20 px-3 py-2 text-xs font-black text-emerald-100 ring-1 ring-emerald-500/40 hover:bg-emerald-500/30 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400">
+        <button disabled={quickBusy} onClick={() => void freeRemaining()} className="min-h-11 flex-1 rounded-xl bg-lime-300/15 px-3 py-2 text-xs font-black text-lime-100 ring-1 ring-lime-300/30 transition hover:bg-lime-300/25 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300">
           Free remaining today
         </button>
       </div>
 
       <section aria-label="Daily schedule">
-        <h2 className="mb-2 text-sm font-bold uppercase tracking-wider text-zinc-400">
+        <h2 className="tt-eyebrow mb-2 text-white/50">
           {selectedTurf?.name ?? "Schedule"} · {selectedDate === todayStr ? "Today" : selectedDate}
         </h2>
         <DateSelector dates={dates} selected={selectedDate} todayStr={todayStr} onSelect={setSelectedDate} />
         <div className="mt-3">
           {loading ? (
-            <p role="status" className="text-sm text-zinc-400">Loading slots…</p>
+            <p role="status" className="text-sm text-white/50">Loading slots…</p>
           ) : slots.length === 0 ? (
-            <p role="status" className="rounded-2xl bg-zinc-900 p-4 text-sm text-zinc-400 ring-1 ring-zinc-800">
+            <p role="status" className="tt-glass rounded-3xl p-4 text-sm text-white/60">
               No slots for this date.
             </p>
           ) : (
@@ -439,9 +441,10 @@ export function AdminDashboard({
           )}
         </div>
       </section>
-      <p className="text-[11px] text-zinc-500">
-        Every update records updated_at / updated_by plus an audit row, and public dashboards refresh live.
+      <p className="font-mono text-[10px] leading-relaxed tracking-wider text-white/40">
+        EVERY UPDATE RECORDS UPDATED_AT / UPDATED_BY PLUS AN AUDIT ROW, AND PUBLIC DASHBOARDS REFRESH LIVE.
       </p>
+      </div>
     </main>
   );
 }

@@ -6,11 +6,25 @@ interface Props {
   loading?: boolean;
 }
 
-const styles: Record<string, string> = {
-  free: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/40",
-  booked: "bg-red-500/15 text-red-300 ring-red-500/40",
-  maintenance: "bg-amber-500/15 text-amber-300 ring-amber-500/40",
-  closed: "bg-zinc-500/15 text-zinc-300 ring-zinc-500/40",
+const card: Record<string, string> = {
+  free: "ring-lime-300/30",
+  booked: "ring-rose-400/30",
+  maintenance: "ring-amber-300/30",
+  closed: "ring-white/10",
+};
+
+const glow: Record<string, string> = {
+  free: "bg-lime-300/15",
+  booked: "bg-rose-400/15",
+  maintenance: "bg-amber-300/15",
+  closed: "bg-white/5",
+};
+
+const dot: Record<string, string> = {
+  free: "bg-lime-300 tt-anim-pulse-dot",
+  booked: "bg-rose-400",
+  maintenance: "bg-amber-300",
+  closed: "bg-white/40",
 };
 
 /** Answers "Is the turf free right now?" from real date/time slot math. */
@@ -20,20 +34,12 @@ export function StatusBanner({ status, loading }: Props) {
       <div
         role="status"
         aria-live="polite"
-        className="rounded-2xl bg-zinc-900 p-4 text-sm text-zinc-400 ring-1 ring-zinc-800"
+        className="tt-glass rounded-3xl p-4 text-sm text-white/60"
       >
         Checking live status…
       </div>
     );
   }
-  const dot =
-    status.state === "free"
-      ? "bg-emerald-400"
-      : status.state === "booked"
-        ? "bg-red-400"
-        : status.state === "maintenance"
-          ? "bg-amber-400"
-          : "bg-zinc-400";
 
   const title =
     status.state === "free"
@@ -48,14 +54,15 @@ export function StatusBanner({ status, loading }: Props) {
     <div
       role="status"
       aria-live="polite"
-      className={cn("rounded-2xl p-4 ring-1", styles[status.state])}
+      className={cn("tt-glass relative overflow-hidden rounded-3xl p-4", card[status.state])}
     >
-      <div className="flex items-center gap-2.5">
-        <span aria-hidden className={cn("h-3 w-3 rounded-full", dot)} />
-        <p className="text-base font-bold">{title}</p>
+      <div aria-hidden className={cn("pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full blur-3xl", glow[status.state])} />
+      <div className="relative flex items-center gap-2.5">
+        <span aria-hidden className={cn("h-3 w-3 shrink-0 rounded-full", dot[status.state])} />
+        <p className="tt-display text-lg font-bold leading-snug text-[#f4efe3]">{title}</p>
       </div>
       {status.state === "booked" && status.nextFreeSlot && (
-        <p className="mt-1 text-sm opacity-80">
+        <p className="relative mt-1 text-sm text-white/60">
           Next free slot will be shown in the schedule below.
         </p>
       )}

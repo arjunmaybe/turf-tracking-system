@@ -71,18 +71,18 @@ export default async function AdminPage() {
     // Server-side unauthorized state: no schedule data is fetched or shown.
     // The client dashboard also re-checks and offers sign-out.
     return (
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-3 p-4">
-        <h1 className="text-xl font-bold text-white">Not authorized</h1>
+      <main className="tt-ambient mx-auto flex w-full max-w-md flex-1 flex-col gap-3 p-4">
+        <h1 className="tt-display text-3xl font-bold text-[#f4efe3]">Not authorized</h1>
         <p
           role="alert"
-          className="rounded-2xl bg-red-500/15 p-4 text-sm text-red-200 ring-1 ring-red-500/40"
+          className="tt-glass rounded-3xl p-4 text-sm text-rose-200 ring-1 ring-rose-400/30"
         >
           This account is not authorized for staff access. Sign in with a staff
           account{user.email ? ` (currently ${user.email})` : ""}.
         </p>
-        <p className="text-xs text-zinc-500">
-          Only users listed in the <code>staff</code> table can use /admin.
-          Database RLS enforces this independently of the UI.
+        <p className="font-mono text-[10px] leading-relaxed tracking-wider text-white/40">
+          ONLY USERS LISTED IN THE <code>staff</code> TABLE CAN USE /admin.
+          DATABASE RLS ENFORCES THIS INDEPENDENTLY OF THE UI.
         </p>
       </main>
     );
